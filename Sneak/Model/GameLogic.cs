@@ -8,11 +8,17 @@ namespace Sneak
     internal class GameLogic
     {
        
-        public int[,] MapData;
+        public int[,] MapData = new int[Settings.windowWidth, Settings.windowHeigth];
         public HungrySnake hongrySneak {  get; set; }
         public IntVector2 dirr = new IntVector2(1, 0);
         public IntVector2 lastdir = new IntVector2(1, 0);
         public IntVector2 nutPosition ;
+        public int level = 1;
+        public int nutsMod = 1;
+        
+        private int gameplayDelay;
+        private string screenText;
+        internal int speedMod = 0;
 
         internal void tryMove(int x, int y)
         {
@@ -40,9 +46,63 @@ namespace Sneak
             nutPosition = freePlaces[rnd.Next(freePlaces.Count)];
         }
 
+        public GameLogic() 
+        {
+            gameplayDelay = 10;
+            screenText = "LEVEL " + level;
+            hongrySneak = new HungrySnake();
+
+            hongrySneak.addSegment(Settings.StartPoint);
+            hongrySneak.addSegment(new IntVector2(11, 10));
+            hongrySneak.addSegment(new IntVector2(12, 10));
+            dirr = new IntVector2(1, 0);
+
+        }
+
+        private void gameWin()
+        {
+            level++;
+            gameplayDelay = 10;
+            screenText = "LEVEL " + level;
+            speedMod = Math.Min(speedMod+10, 100);
+
+            hongrySneak = new HungrySnake();
+            hongrySneak.addSegment(Settings.StartPoint);
+            hongrySneak.addSegment(new IntVector2(11, 10));
+            hongrySneak.addSegment(new IntVector2(12, 10));
+            dirr = new IntVector2(1, 0);
+        }
+        private void gameLose()
+        {
+            gameplayDelay = 1000;
+            screenText = "YOU DIE";
+            hongrySneak = null;
+            
+        }
+
+        public string getScreenText()
+        {
+            return gameplayDelay > 0 ? screenText : "";
+        }
+
         internal void update()
         {
             
+            if (gameplayDelay > 0 || hongrySneak == null)
+            {
+                gameplayDelay--;
+                if (gameplayDelay == 0)
+                {
+                    dirr = new IntVector2(1, 0);
+                    Console.Clear();
+                }
+                else
+                {
+                    return;
+                }
+                
+            }
+
             MapData = new int[Settings.windowWidth, Settings.windowHeigth];
             lastdir = dirr;
 
@@ -72,19 +132,27 @@ namespace Sneak
             int newy = hongrySneak.HeadCoord.y + dirr.y;
             if (newX == 0)
             {
-                newX = Settings.windowWidth-2;
+                gameLose();
+                return;
+                //newX = Settings.windowWidth-2;
             }
             if (newX == Settings.windowWidth-1)
             {
-                newX = 1;
+                gameLose();
+                return;
+                //newX = 1;
             }
             if (newy == 0)
             {
-                newy = Settings.windowHeigth - 2;
+                gameLose();
+                return;
+                // newy = Settings.windowHeigth - 2;
             }
             if (newy == Settings.windowHeigth - 1)
             {
-                newy = 1;
+                gameLose();
+                return;
+                // newy = 1;
             }
 
             if (nutPosition.x == newX
@@ -93,6 +161,14 @@ namespace Sneak
                 hongrySneak.addSegment(new IntVector2(newX, newy));
                 nutPosition.x = 0;
                 nutPosition.y = 0;
+
+                //проверяем победу
+                if (hongrySneak.segments.Count - 3 >= nutsMod + level * nutsMod)
+                {
+                    gameWin();
+                    return;
+                }
+                   
             }
             else
             {

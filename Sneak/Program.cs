@@ -12,18 +12,21 @@ namespace Sneak
     {
         static void Main(string[] args)
         {
+            
+
             Console.SetWindowSize(Settings.windowWidth*2, Settings.windowHeigth+2);
+            Console.OutputEncoding = Encoding.UTF8;
 
             GameLogic gameLogic = new GameLogic();
-            HungrySnake hongrySneak = new HungrySnake();
+            //HungrySnake hongrySneak = new HungrySnake();
             Render render = new Render();
             Input input = new Input();
 
-            hongrySneak.addSegment(Settings.StartPoint);
-            hongrySneak.addSegment(new IntVector2(11, 10));
-            hongrySneak.addSegment(new IntVector2(12, 10));
+            //hongrySneak.addSegment(Settings.StartPoint);
+            //hongrySneak.addSegment(new IntVector2(11, 10));
+           // hongrySneak.addSegment(new IntVector2(12, 10));
            
-            gameLogic.hongrySneak = hongrySneak;
+            //gameLogic.hongrySneak = hongrySneak;
             render.gameLogic = gameLogic;
             input.gameLogic = gameLogic;
             
@@ -33,7 +36,7 @@ namespace Sneak
                 gameLogic.update();
                 render.rend();
 
-                Thread.Sleep(Settings.delay);
+                Thread.Sleep(Settings.delay- gameLogic.speedMod);
                 
             }
 

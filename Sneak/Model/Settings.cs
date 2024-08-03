@@ -2,7 +2,7 @@
 {
     static class Settings
     {
-        public static int delay = 333;
+        public static int delay = 222;
         public static int windowWidth = 20;
         public static int windowHeigth = 20;
 
